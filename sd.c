@@ -2667,7 +2667,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 	struct scsi_mode_data data;
 	int old_wp = sdkp->write_prot;
 
-	set_disk_ro(sdkp->disk, 0);
+	set_disk_ro(sdkp->disk, 1);
 	if (sdp->skip_ms_page_3f) {
 		sd_first_printk(KERN_NOTICE, sdkp, "Assuming Write Enabled\n");
 		return;
@@ -2705,7 +2705,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 			  "Test WP failed, assume Write Enabled\n");
 	} else {
 		sdkp->write_prot = ((data.device_specific & 0x80) != 0);
-		set_disk_ro(sdkp->disk, sdkp->write_prot);
+		set_disk_ro(sdkp->disk, 1);
 		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
 			sd_printk(KERN_NOTICE, sdkp, "Write Protect is %s\n",
 				  sdkp->write_prot ? "on" : "off");
