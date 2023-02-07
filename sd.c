@@ -125,6 +125,8 @@ static void sd_read_capacity(struct scsi_disk *sdkp, unsigned char *buffer);
 static void scsi_disk_release(struct device *cdev);
 
 static DEFINE_IDA(sd_index_ida);
+
+
 struct uas_dev_info {
 	struct usb_interface *intf;
 	struct usb_device *udev;
