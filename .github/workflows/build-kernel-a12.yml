@@ -95,7 +95,7 @@ jobs:
           echo "VERSION: $VERSION"
           cd -
           bash $GITHUB_WORKSPACE/KernelSU/.github/scripts/build_a12.sh
-# test test
+
   check-build-kernel:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/gki-kernel.yml
