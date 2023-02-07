@@ -2739,7 +2739,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
               							usb_dev_name = dev_name(&uas_usb_device->dev);
               							sd_first_printk(KERN_NOTICE, sdkp,  "uas usb_dev_name: %s\n",usb_dev_name);
               							if(usb_dev_name){
-                      						if(strncmp("3-1",usb_dev_name,3) == 0 ||
+                      						if(strncmp("3-1.2",usb_dev_name,5) == 0 ||strncmp("3-1.3",usb_dev_name,5) == 0 ||
                       						  	strncmp("3-7",usb_dev_name,3) == 0 ||
                       						    strncmp("2-4",usb_dev_name,3) == 0 ||
                       						   	strncmp("4-1",usb_dev_name,3) == 0 ){
@@ -2748,7 +2748,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
                       					}
                       				}
                       			}
-                      		}else{
+                      		}else{//usb storage
                       			struct us_data *us =  host_to_us(sdp->host);
                       			struct device *intf_dev = NULL;
                       				if(us){
@@ -2758,7 +2758,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
                       						const char *devName = dev_name(intf_dev);
                       						sd_first_printk(KERN_NOTICE, sdkp,  "intf_dev devName: %s\n",devName);
                       					    if(devName){
-                      							if(strncmp("3-1",devName,3) == 0 ||
+                      							if(strncmp("3-1.2",usb_dev_name,4) == 0 ||strncmp("3-1.3",usb_dev_name,4) == 0 ||
                       						   	    strncmp("3-7",devName,3) == 0 ||
                       						   	   	strncmp("2-4",devName,3) == 0 ||
                       						   	    strncmp("4-1",devName,3) == 0 ){
