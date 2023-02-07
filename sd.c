@@ -134,7 +134,22 @@ static DEFINE_MUTEX(sd_ref_mutex);
 static struct kmem_cache *sd_cdb_cache;
 static mempool_t *sd_cdb_pool;
 static mempool_t *sd_page_pool;
-
+struct uas_dev_info {
+	struct usb_interface *intf;
+	struct usb_device *udev;
+	struct usb_anchor cmd_urbs;
+	struct usb_anchor sense_urbs;
+	struct usb_anchor data_urbs;
+	unsigned long flags;
+	int qdepth, resetting;
+	unsigned cmd_pipe, status_pipe, data_in_pipe, data_out_pipe;
+	unsigned use_streams:1;
+	unsigned shutdown:1;
+	struct scsi_cmnd *cmnd[256];
+	spinlock_t lock;
+	struct work_struct work;
+	struct work_struct scan_work;      /* for async scanning */
+};
 static const char *sd_cache_types[] = {
 	"write through", "none", "write back",
 	"write back, no read (daft)"
@@ -2665,7 +2680,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 	struct scsi_device *sdp = sdkp->device;
 	struct scsi_mode_data data;
 	int old_wp = sdkp->write_prot;
-
+	char * usb_type_name=NULL;
 	set_disk_ro(sdkp->disk, 0);
 	if (sdp->skip_ms_page_3f) {
 		sd_first_printk(KERN_NOTICE, sdkp, "Assuming Write Enabled\n");
@@ -2703,39 +2718,54 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 		sd_first_printk(KERN_WARNING, sdkp,
 			  "Test WP failed, assume Write Enabled\n");
 	} else {
-		sdkp->write_prot = ((data.device_specific & 0x80) != 0);
-		struct device sddp=sdkp->dev;
-		u32 index=sdkp->index;
-        const char* vendor=sdp->vendor;
-        //index at [0,5] is the inside devices
-        if(index>5){
-            if(sdp->host){
-                struct us_data *us =host_to_us(sdp->host);
-                if(us){
-                    struct usb_device *usb_dev=us->pusb_dev;
-                    if(usb_dev){
-                        sd_printk(KERN_NOTICE, sdkp, "devnum = %d\n",usb_dev->devnum);
-                        sd_printk(KERN_NOTICE, sdkp, "level = %d\n",usb_dev->level);
-                        sd_printk(KERN_NOTICE, sdkp, "devaddr = %d\n",usb_dev->devaddr);
-                        sd_printk(KERN_NOTICE, sdkp, "devpath = %s\n",usb_dev->devpath);
-                        sd_printk(KERN_NOTICE, sdkp, "portnum = %d\n",usb_dev->portnum);
-                        sd_printk(KERN_NOTICE, sdkp, "ttport = %d\n",usb_dev->ttport);
-                        if(usb_dev->portnum==2||usb_dev->portnum==3){
-                            sdkp->write_prot=0;
-                        }else{
-                            sdkp->write_prot=1;
-                        }
-                    }else{
-                        sdkp->write_prot=1;
-                    }
-                }else{
-                    sdkp->write_prot=1;
-                }
-            }else{
-                sdkp->write_prot=1;
-            }
-        }else{
-            sdkp->write_prot=0;
+		sd_first_printk(KERN_WARNING, sdkp,
+    			  "Test WP success, assume Write Enabled\n");
+    	sdkp->write_prot=1;
+        if(sdp->host){
+			usb_type_name = sdp->host->hostt->name;  //uas or usb_storage xxx
+			sd_first_printk(KERN_NOTICE, sdkp,  "sdp->host->hostt->name: %s\n",usb_type_name);
+			if(usb_type_name){
+				if(strncmp("uas",usb_type_name,3) == 0){
+					struct uas_dev_info *uas_devinfo = (struct uas_dev_info *)sdp->host->hostdata;
+					if(uas_devinfo){
+						struct usb_device *uas_usb_device = uas_devinfo->udev;
+						const char *usb_dev_name = NULL;
+						if(uas_usb_device){
+							usb_dev_name = dev_name(&uas_usb_device->dev);
+							sd_first_printk(KERN_NOTICE, sdkp,  "uas usb_dev_name: %s\n",usb_dev_name);
+							if(usb_dev_name){
+        						if(strncmp("3-1",usb_dev_name,3) == 0 ||
+        						  	strncmp("3-7",usb_dev_name,3) == 0 ||
+        						    strncmp("2-4",usb_dev_name,3) == 0 ||
+        						   	strncmp("4-1",usb_dev_name,3) == 0 ){
+        						   	sdkp->write_prot = 0;
+        						}
+        					}
+        				}
+        			}
+        		}else{
+        			struct us_data *us =  host_to_us(sdp->host);
+        			struct device *intf_dev = NULL;
+        				if(us){
+        					sd_first_printk(KERN_NOTICE, sdkp,  "us scsi_name: %s\n",us->scsi_name);
+        					intf_dev = (struct device *)&us->pusb_intf->dev;
+        					if(intf_dev){
+        						const char *devName = dev_name(intf_dev);
+        						sd_first_printk(KERN_NOTICE, sdkp,  "intf_dev devName: %s\n",devName);
+        					    if(devName){
+        							if(strncmp("3-1",devName,3) == 0 ||
+        						   	    strncmp("3-7",devName,3) == 0 ||
+        						   	   	strncmp("2-4",devName,3) == 0 ||
+        						   	    strncmp("4-1",devName,3) == 0 ){
+        						   		sdkp->write_prot = 0;
+        						 	}
+        						}
+        					}else{
+        					    sd_first_printk(KERN_NOTICE, sdkp, "intf_dev null\n");
+        				}
+        			}
+        		}
+        	}
         }
         set_disk_ro(sdkp->disk, sdkp->write_prot);
 		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
