@@ -2715,8 +2715,11 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
                     struct usb_device *usb_dev=us->pusb_dev;
                     if(usb_dev){
                         sd_printk(KERN_NOTICE, sdkp, "devnum = %d\n",usb_dev->devnum);
+                        sd_printk(KERN_NOTICE, sdkp, "level = %d\n",usb_dev->level);
+                        sd_printk(KERN_NOTICE, sdkp, "devaddr = %d\n",usb_dev->devaddr);
                         sd_printk(KERN_NOTICE, sdkp, "devpath = %s\n",usb_dev->devpath);
                         sd_printk(KERN_NOTICE, sdkp, "portnum = %d\n",usb_dev->portnum);
+                        sd_printk(KERN_NOTICE, sdkp, "ttport = %d\n",usb_dev->ttport);
                         if(usb_dev->portnum==2||usb_dev->portnum==3){
                             sdkp->write_prot=0;
                         }else{
