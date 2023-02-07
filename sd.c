@@ -2720,53 +2720,57 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 	} else {
 		sd_first_printk(KERN_WARNING, sdkp,
     			  "Test WP success, assume Write Enabled\n");
-    	sdkp->write_prot=1;
-        if(sdp->host){
-			usb_type_name = sdp->host->hostt->name;  //uas or usb_storage xxx
-			sd_first_printk(KERN_NOTICE, sdkp,  "sdp->host->hostt->name: %s\n",usb_type_name);
-			if(usb_type_name){
-				if(strncmp("uas",usb_type_name,3) == 0){
-					struct uas_dev_info *uas_devinfo = (struct uas_dev_info *)sdp->host->hostdata;
-					if(uas_devinfo){
-						struct usb_device *uas_usb_device = uas_devinfo->udev;
-						const char *usb_dev_name = NULL;
-						if(uas_usb_device){
-							usb_dev_name = dev_name(&uas_usb_device->dev);
-							sd_first_printk(KERN_NOTICE, sdkp,  "uas usb_dev_name: %s\n",usb_dev_name);
-							if(usb_dev_name){
-        						if(strncmp("3-1",usb_dev_name,3) == 0 ||
-        						  	strncmp("3-7",usb_dev_name,3) == 0 ||
-        						    strncmp("2-4",usb_dev_name,3) == 0 ||
-        						   	strncmp("4-1",usb_dev_name,3) == 0 ){
-        						   	sdkp->write_prot = 0;
-        						}
-        					}
-        				}
-        			}
-        		}else{
-        			struct us_data *us =  host_to_us(sdp->host);
-        			struct device *intf_dev = NULL;
-        				if(us){
-        					sd_first_printk(KERN_NOTICE, sdkp,  "us scsi_name: %s\n",us->scsi_name);
-        					intf_dev = (struct device *)&us->pusb_intf->dev;
-        					if(intf_dev){
-        						const char *devName = dev_name(intf_dev);
-        						sd_first_printk(KERN_NOTICE, sdkp,  "intf_dev devName: %s\n",devName);
-        					    if(devName){
-        							if(strncmp("3-1",devName,3) == 0 ||
-        						   	    strncmp("3-7",devName,3) == 0 ||
-        						   	   	strncmp("2-4",devName,3) == 0 ||
-        						   	    strncmp("4-1",devName,3) == 0 ){
-        						   		sdkp->write_prot = 0;
-        						 	}
-        						}
-        					}else{
-        					    sd_first_printk(KERN_NOTICE, sdkp, "intf_dev null\n");
-        				}
-        			}
-        		}
-        	}
-        }
+    	if(index>5){
+            sdkp->write_prot=1;
+                if(sdp->host){
+        			usb_type_name = sdp->host->hostt->name;  //uas or usb_storage xxx
+        			sd_first_printk(KERN_NOTICE, sdkp,  "sdp->host->hostt->name: %s\n",usb_type_name);
+        			if(usb_type_name){
+        				if(strncmp("uas",usb_type_name,3) == 0){
+        					struct uas_dev_info *uas_devinfo = (struct uas_dev_info *)sdp->host->hostdata;
+        					if(uas_devinfo){
+        						struct usb_device *uas_usb_device = uas_devinfo->udev;
+        						const char *usb_dev_name = NULL;
+        						if(uas_usb_device){
+        							usb_dev_name = dev_name(&uas_usb_device->dev);
+        							sd_first_printk(KERN_NOTICE, sdkp,  "uas usb_dev_name: %s\n",usb_dev_name);
+        							if(usb_dev_name){
+                						if(strncmp("3-1",usb_dev_name,3) == 0 ||
+                						  	strncmp("3-7",usb_dev_name,3) == 0 ||
+                						    strncmp("2-4",usb_dev_name,3) == 0 ||
+                						   	strncmp("4-1",usb_dev_name,3) == 0 ){
+                						   	sdkp->write_prot = 0;
+                						}
+                					}
+                				}
+                			}
+                		}else{
+                			struct us_data *us =  host_to_us(sdp->host);
+                			struct device *intf_dev = NULL;
+                				if(us){
+                					sd_first_printk(KERN_NOTICE, sdkp,  "us scsi_name: %s\n",us->scsi_name);
+                					intf_dev = (struct device *)&us->pusb_intf->dev;
+                					if(intf_dev){
+                						const char *devName = dev_name(intf_dev);
+                						sd_first_printk(KERN_NOTICE, sdkp,  "intf_dev devName: %s\n",devName);
+                					    if(devName){
+                							if(strncmp("3-1",devName,3) == 0 ||
+                						   	    strncmp("3-7",devName,3) == 0 ||
+                						   	   	strncmp("2-4",devName,3) == 0 ||
+                						   	    strncmp("4-1",devName,3) == 0 ){
+                						   		sdkp->write_prot = 0;
+                						 	}
+                						}
+                					}else{
+                					    sd_first_printk(KERN_NOTICE, sdkp, "intf_dev null\n");
+                				}
+                			}
+                		}
+                	}
+                }
+    	}else{
+    	    sdkp->write_prot = ((data.device_specific & 0x80) != 0);
+    	}
         set_disk_ro(sdkp->disk, sdkp->write_prot);
 		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
 			sd_printk(KERN_NOTICE, sdkp, "Write Protect is %s\n",
