@@ -1,3 +1,4 @@
+// 0rigina1 test
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *      sd.c Copyright (C) 1992 Drew Eckhardt
@@ -32,6 +33,7 @@
  *	Note: when the logging level is set by the user, it must be greater
  *	than the level indicated above to trigger output.	
  */
+
 
 #include <linux/module.h>
 #include <linux/fs.h>
@@ -70,7 +72,6 @@
 #include <scsi/scsicam.h>
 
 #include "sd.h"
-#include "../usb/storage/usb.h"
 #include "scsi_priv.h"
 #include "scsi_logging.h"
 
@@ -2704,37 +2705,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 			  "Test WP failed, assume Write Enabled\n");
 	} else {
 		sdkp->write_prot = ((data.device_specific & 0x80) != 0);
-		struct device sddp=sdkp->dev;
-		u32 index=sdkp->index;
-        const char* vendor=sdp->vendor;
-        //index at [0,5] is the inside devices
-        if(index>5){
-            if(sdp->host){
-                struct us_data *us =host_to_us(sdp->host);
-                if(us){
-                    struct usb_device *usb_dev=us->pusb_dev;
-                    if(usb_dev){
-                        sd_printk(KERN_NOTICE, sdkp, "devnum = %d\n",usb_dev->devnum);
-                        sd_printk(KERN_NOTICE, sdkp, "devpath = %s\n",usb_dev->devpath);
-                        sd_printk(KERN_NOTICE, sdkp, "portnum = %d\n",usb_dev->portnum);
-                        if(usb_dev->portnum==2||usb_dev->portnum==3){
-                            sdkp->write_prot=0;
-                        }else{
-                            sdkp->write_prot=1;
-                        }
-                    }else{
-                        sdkp->write_prot=1;
-                    }
-                }else{
-                    sdkp->write_prot=1;
-                }
-            }else{
-                sdkp->write_prot=1;
-            }
-        }else{
-            sdkp->write_prot=0;
-        }
-        set_disk_ro(sdkp->disk, sdkp->write_prot);
+		set_disk_ro(sdkp->disk, sdkp->write_prot);
 		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
 			sd_printk(KERN_NOTICE, sdkp, "Write Protect is %s\n",
 				  sdkp->write_prot ? "on" : "off");
@@ -3474,16 +3445,15 @@ static int sd_probe(struct device *dev)
 	}
 
 	device_initialize(&sdkp->dev);
-	sdkp->dev.parent = get_device(dev);
+	sdkp->dev.parent = dev;
 	sdkp->dev.class = &sd_disk_class;
 	dev_set_name(&sdkp->dev, "%s", dev_name(dev));
 
 	error = device_add(&sdkp->dev);
-	if (error) {
-		put_device(&sdkp->dev);
-		goto out;
-	}
+	if (error)
+		goto out_free_index;
 
+	get_device(dev);
 	dev_set_drvdata(dev, sdkp);
 
 	gd->major = sd_major((index & 0xf0) >> 4);
