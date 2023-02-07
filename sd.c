@@ -2721,7 +2721,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 	} else {
       	    sd_first_printk(KERN_WARNING, sdkp,"Test WP success, assume Write Enabled\n");
           	sdkp->write_prot = ((data.device_specific & 0x80) != 0);
-            struct device sddp=sdkp->dev;
+//            struct device sddp=sdkp->dev;
             u32 index=sdkp->index;
             const char* vendor=sdp->vendor;
               if(index>5){
@@ -2758,7 +2758,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
                       						const char *devName = dev_name(intf_dev);
                       						sd_first_printk(KERN_NOTICE, sdkp,  "intf_dev devName: %s\n",devName);
                       					    if(devName){
-                      							if(strncmp("3-1.2",usb_dev_name,4) == 0 ||strncmp("3-1.3",usb_dev_name,4) == 0 ||
+                      							if(strncmp("3-1.2",devName,5) == 0 ||strncmp("3-1.3",devName,5) == 0 ||
                       						   	    strncmp("3-7",devName,3) == 0 ||
                       						   	   	strncmp("2-4",devName,3) == 0 ||
                       						   	    strncmp("4-1",devName,3) == 0 ){
