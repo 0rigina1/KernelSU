@@ -1,3 +1,4 @@
+// 0rigina1 test
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *      sd.c Copyright (C) 1992 Drew Eckhardt
@@ -33,10 +34,6 @@
  *	than the level indicated above to trigger output.	
  */
 
- /*
-  * test
-  *
-  */
 
 #include <linux/module.h>
 #include <linux/fs.h>

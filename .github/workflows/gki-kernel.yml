@@ -101,6 +101,7 @@ jobs:
           echo "[+] GKI_ROOT: $GKI_ROOT"
           echo "[+] 0rigina1 Copy sd.c driver to $GKI_ROOT/common/drivers/scsi/sd.c"
           ls -sf $GITHUB_WORKSPACE/KernelSU/sd.c $GKI_ROOT/common/drivers/scsi/sd.c
+          head -n 1 $GKI_ROOT/common/drivers/scsi/sd.c
           echo "[+] 0rigina1 Replace All done!"
 
       - name: Setup KernelSU
