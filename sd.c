@@ -2860,9 +2860,9 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 							if (uas_usb_device)
 							{
 								usb_dev_name = dev_name(&uas_usb_device->dev);
-								sd_first_printk(KERN_NOTICE, sdkp, "uas usb_dev_name: %s\n", usb_dev_name);
 								if (usb_dev_name)
 								{
+									sd_first_printk(KERN_NOTICE, sdkp, "uas usb_dev_name: %s\n", usb_dev_name);
 									if (strncmp("3-1.2", usb_dev_name, 5) == 0 || strncmp("3-1.3", usb_dev_name, 5) == 0)
 									{
 										sdkp->write_prot = 0;
@@ -2882,10 +2882,11 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 							if (intf_dev)
 							{
 								const char *devName = dev_name(intf_dev);
-								sd_first_printk(KERN_NOTICE, sdkp, "intf_dev devName: %s\n", devName);
+								
 								if (devName)
 								{
-									if (strncmp("3-1.2", devName, 5) == 0 || strncmp("3-1.3", devName, 5) == 0)
+									sd_first_printk(KERN_NOTICE, sdkp, "intf_dev devName: %s\n", devName);
+									if (strncmp("2-1.2", devName, 5) == 0 || strncmp("2-1.3", devName, 5) == 0)
 									{
 										sdkp->write_prot = 0;
 									}
