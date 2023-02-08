@@ -2851,7 +2851,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 				{
 					if (strncmp("uas", usb_type_name, 3) == 0)
 					{
-						
+
 						struct uas_dev_info *uas_devinfo = (struct uas_dev_info *)sdp->host->hostdata;
 						if (uas_devinfo)
 						{
@@ -2902,7 +2902,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 		}
 		else
 		{
-			sdkp->write_port = 0;
+			sdkp->write_prot = 0;
 		}
 		set_disk_ro(sdkp->disk, sdkp->write_prot);
 		if (sdkp->first_scan || old_wp != sdkp->write_prot)
