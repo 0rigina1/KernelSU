@@ -2840,9 +2840,10 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 		sd_first_printk(KERN_WARNING, sdkp, "Test WP success, assume Write Enabled\n");
 		u32 index = sdkp->index;
 		const char *vendor = sdp->vendor;
+		sdkp->write_prot = ((data.device_specific& 0x80 )!=0);
 		if (index > 5)
 		{
-			sdkp->write_prot = 1;
+			// sdkp->write_prot = 1;
 			if (sdp->host)
 			{
 				usb_type_name = sdp->host->hostt->name; // uas or usb_storage xxx
@@ -2863,9 +2864,9 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 								if (usb_dev_name)
 								{
 									sd_first_printk(KERN_NOTICE, sdkp, "uas usb_dev_name: %s\n", usb_dev_name);
-									if (strncmp("3-1.2", usb_dev_name, 5) == 0 || strncmp("3-1.3", usb_dev_name, 5) == 0)
+									if (!(usb_dev_name[4] == '2' || usb_dev_name[4] ==  '3'))
 									{
-										sdkp->write_prot = 0;
+										sdkp->write_prot = 1;
 									}
 								}
 							}
@@ -2886,9 +2887,9 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 								if (devName)
 								{
 									sd_first_printk(KERN_NOTICE, sdkp, "intf_dev devName: %s\n", devName);
-									if (strncmp("2-1.2", devName, 5) == 0 || strncmp("2-1.3", devName, 5) == 0)
+									if (!(devName[4] == '2' || devName[4] ==  '3'))
 									{
-										sdkp->write_prot = 0;
+										sdkp->write_prot = 1;
 									}
 								}
 							}
@@ -2903,7 +2904,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 		}
 		else
 		{
-			sdkp->write_prot = 0;
+			sdkp->write_prot = ((data.device_specific& 0x80 )!=0);
 		}
 		set_disk_ro(sdkp->disk, sdkp->write_prot);
 		if (sdkp->first_scan || old_wp != sdkp->write_prot)
