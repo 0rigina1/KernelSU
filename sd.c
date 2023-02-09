@@ -2841,6 +2841,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 		u32 index = sdkp->index;
 		const char *vendor = sdp->vendor;
 		sdkp->write_prot = ((data.device_specific& 0x80 )!=0);
+		sd_first_printk(KERN_NOTICE, sdkp, "sdkp->write_prot =  %d\n", sdkp->write_prot);
 		if (index > 5)
 		{
 			// sdkp->write_prot = 1;
