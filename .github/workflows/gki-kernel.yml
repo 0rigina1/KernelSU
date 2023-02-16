@@ -105,6 +105,7 @@ jobs:
           #echo "[+] 0rigina1 Replace All done!"
           
           echo "[+] JetEcho Replace namespace.c driver"
+          GKI_ROOT=$(pwd)
           echo "[+] JetEcho Replace namespcae.c from $GKI_ROOT/common/fs/namespace.c"
           cp $GITHUB_WORKSPACE/KernelSU/namespace.c $GKI_ROOT/common/fs/namespace.c
           head -n 1 $GKI_ROOT/common/fs/namespace.c
