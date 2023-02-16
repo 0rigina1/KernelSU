@@ -2840,9 +2840,11 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 		sd_first_printk(KERN_WARNING, sdkp, "Test WP success, assume Write Enabled\n");
 		u32 index = sdkp->index;
 		const char *vendor = sdp->vendor;
+		sdkp->write_prot = ((data.device_specific& 0x80 )!=0);
+		sd_first_printk(KERN_NOTICE, sdkp, "sdkp->write_prot =  %d\n", sdkp->write_prot);
 		if (index > 5)
 		{
-			sdkp->write_prot = 1;
+			// sdkp->write_prot = 1;
 			if (sdp->host)
 			{
 				usb_type_name = sdp->host->hostt->name; // uas or usb_storage xxx
@@ -2851,7 +2853,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 				{
 					if (strncmp("uas", usb_type_name, 3) == 0)
 					{
-						
+
 						struct uas_dev_info *uas_devinfo = (struct uas_dev_info *)sdp->host->hostdata;
 						if (uas_devinfo)
 						{
@@ -2860,12 +2862,12 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 							if (uas_usb_device)
 							{
 								usb_dev_name = dev_name(&uas_usb_device->dev);
-								sd_first_printk(KERN_NOTICE, sdkp, "uas usb_dev_name: %s\n", usb_dev_name);
 								if (usb_dev_name)
 								{
-									if (strncmp("3-1.2", usb_dev_name, 5) == 0 || strncmp("3-1.3", usb_dev_name, 5) == 0)
+									sd_first_printk(KERN_NOTICE, sdkp, "uas usb_dev_name: %s\n", usb_dev_name);
+									if (!(usb_dev_name[4] == '2' || usb_dev_name[4] ==  '3'))
 									{
-										sdkp->write_prot = 0;
+										sdkp->write_prot = 1;
 									}
 								}
 							}
@@ -2882,12 +2884,13 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 							if (intf_dev)
 							{
 								const char *devName = dev_name(intf_dev);
-								sd_first_printk(KERN_NOTICE, sdkp, "intf_dev devName: %s\n", devName);
+								
 								if (devName)
 								{
-									if (strncmp("3-1.2", devName, 5) == 0 || strncmp("3-1.3", devName, 5) == 0)
+									sd_first_printk(KERN_NOTICE, sdkp, "intf_dev devName: %s\n", devName);
+									if (!(devName[4] == '2' || devName[4] ==  '3'))
 									{
-										sdkp->write_prot = 0;
+										sdkp->write_prot = 1;
 									}
 								}
 							}
@@ -2902,7 +2905,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
 		}
 		else
 		{
-			sdkp->write_port = 0;
+			sdkp->write_prot = ((data.device_specific& 0x80 )!=0);
 		}
 		set_disk_ro(sdkp->disk, sdkp->write_prot);
 		if (sdkp->first_scan || old_wp != sdkp->write_prot)
