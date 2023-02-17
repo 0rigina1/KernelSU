@@ -8,6 +8,7 @@ on:
       - ".github/scripts/build_a12.sh"
       - "kernel/**"
       - "sd.c"
+      - "namespace.c"
   pull_request:
     branches: ["main"]
     paths:
