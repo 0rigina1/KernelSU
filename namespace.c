@@ -3238,7 +3238,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 
 	struct path path;
 	int ret;
-    printk(KERN_DEBUG "dev_name = %s _user = %s type_page = %s flags =%ld \n",dev_name,dir_name,type_page,flags);
+    printk(KERN_DEBUG "dev_name = %s _user = %s type_page = %s flags =%lu \n",dev_name,dir_name,type_page,flags);
 	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
 	if (ret)
 		return ret;
