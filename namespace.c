@@ -3238,8 +3238,9 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 	struct path path;
 	int ret;
 	if(!strncmp(dev_name,"/dev/block/vold/public",22)){
-		printk(KERN_WARNING "Frome JetEcho At %s dev_name = %s type_page = %s flags = %lu \n",__func__,dev_name,type_page,flags);
+		printk(KERN_WARNING "Frome JetEcho At %s dev_name = %s type_page = %s flags before = %lu ",__func__,dev_name,type_page,flags);
 		flags|=1;
+		printk(KERN_WARNING " flag after = %lu \n",flags);
 	}
 	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
 	if (ret)
