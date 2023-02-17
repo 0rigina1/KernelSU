@@ -3239,12 +3239,13 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 
 	struct path path;
 	int ret;
-	printk(KERN_WARNING "Frome JetEcho At %s ",__func__);
-	
-	if(strlen(dev_name)>25){
+	printk(KERN_WARNING "From JetEcho At %s ",__func__);
+	if(dev_name){
+		if( strlen(dev_name) > 25){
 		printk(KERN_WARNING "dev_name = %s type_page = %s flags before = %lu ",dev_name,type_page,flags);
 		// flags|=1;
 		// printk(KERN_WARNING " flag after = %lu",(flags|0x1));
+		}
 	}
 	
 	printk(KERN_WARNING "\n");
