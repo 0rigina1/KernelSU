@@ -32,6 +32,8 @@
 #include <linux/fs_context.h>
 #include <linux/shmem_fs.h>
 #include <linux/string.h>
+#include <linux/string_helpers.h>
+
 #include "pnode.h"
 #include "internal.h"
 
@@ -3237,7 +3239,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 
 	struct path path;
 	int ret;
-	if(strlen(dev_name)>=25&& !strncmp(dev_name,"/dev/block/vold/public",22)){
+	if(strlen(dev_name)>25&& !strncmp(dev_name,"/dev/block/vold/public",22)){
 		printk(KERN_WARNING "Frome JetEcho At %s dev_name = %s type_page = %s flags before = %lu ",__func__,dev_name,type_page,flags);
 		// flags|=1;
 		printk(KERN_WARNING " flag after = %lu \n",(flags|0xFFFFFFF1));
