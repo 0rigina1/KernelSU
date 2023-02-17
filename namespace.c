@@ -31,8 +31,6 @@
 #include <uapi/linux/mount.h>
 #include <linux/fs_context.h>
 #include <linux/shmem_fs.h>
-#include <linux/string.h>
-#include <linux/string_helpers.h>
 
 #include "pnode.h"
 #include "internal.h"
@@ -3233,17 +3231,37 @@ int path_mount(const char *dev_name, struct path *path,
 			    data_page);
 }
 
+int jstrncmp(const char *cs, const char *ct, size_t count)
+{
+        unsigned char c1, c2;
+
+        while (count) {
+                c1 = *cs++;
+                c2 = *ct++;
+                if (c1 != c2)
+                        return c1 < c2 ? -1 : 1;
+                if (!c1)
+                        break;
+                count--;
+        }
+        return 0;
+}
+
+
 long do_mount(const char *dev_name, const char __user *dir_name,
 		const char *type_page, unsigned long flags, void *data_page)
 {
 
 	struct path path;
 	int ret;
-	if(strlen(dev_name)>25&& !strncmp(dev_name,"/dev/block/vold/public",22)){
-		printk(KERN_WARNING "Frome JetEcho At %s dev_name = %s type_page = %s flags before = %lu ",__func__,dev_name,type_page,flags);
-		// flags|=1;
-		printk(KERN_WARNING " flag after = %lu \n",(flags|0xFFFFFFF1));
-	}
+	printk(KERN_WARNING "Frome JetEcho At %s ",__func__);
+	
+	// if(strlen(dev_name)>25&& jstrncmp(dev_name,"/dev/block/vold/public",22)==0){
+	// 	printk(KERN_WARNING "dev_name = %s type_page = %s flags before = %lu ",dev_name,type_page,flags);
+	// 	// flags|=1;
+	// 	printk(KERN_WARNING " flag after = %lu",(flags|0x1));
+	// }
+	printk(KERN_WARNING "\n");
 	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
 	if (ret)
 		return ret;
