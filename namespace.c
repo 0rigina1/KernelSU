@@ -3245,6 +3245,10 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 		printk(KERN_WARNING "dev_name = %s type_page = %s flags before = %lu ",dev_name,type_page,flags);
 		// flags|=1;
 		// printk(KERN_WARNING " flag after = %lu",(flags|0x1));
+			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
+				flags|=1;
+		 		printk(KERN_WARNING " flag after = %lu",(flags));
+		 	}
 		}
 	}
 	
