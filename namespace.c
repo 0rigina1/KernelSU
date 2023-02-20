@@ -31,7 +31,6 @@
 #include <uapi/linux/mount.h>
 #include <linux/fs_context.h>
 #include <linux/shmem_fs.h>
-#include <linux/fs.h>
 
 #include "pnode.h"
 #include "internal.h"
@@ -3247,25 +3246,25 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 		// flags|=1;
 		// printk(KERN_WARNING " flag after = %lu",(flags|0x1));
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
-				char *bus_path;
-				struct dentry* dent=path.dentry;
-				int err dent->d_inode->op->readlink(dent,bus_path,PATH_MAX);
-				if(err>=0){
-					printk(KERN_WARNING "bus_path = %s ",bus_path);
-				}
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
-
-				
 		 	}
 		}
 	}
 	
 	printk(KERN_WARNING "\n");
-	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
+	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);//path在这里赋值
+	if(path){
+		char *bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
+		err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
+		if(err>=0){
+			printk(KERN_WARNING "bus_path = %s ",bus_path);
+		}
+	}
 	if (ret)
 		return ret;
 	ret = path_mount(dev_name, &path, type_page, flags, data_page);
+
 	path_put(&path);
 	return ret;
 }
