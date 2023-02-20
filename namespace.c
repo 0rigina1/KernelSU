@@ -3247,15 +3247,16 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 		// flags|=1;
 		// printk(KERN_WARNING " flag after = %lu",(flags|0x1));
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
-				char *bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
-				int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
+				char *bus_path;
+				struct dentry* dent=path.dentry;
+				int err dent->d_inode->op->readlink(dent,bus_path,PATH_MAX);
 				if(err>=0){
 					printk(KERN_WARNING "bus_path = %s ",bus_path);
 				}
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
 
-				kfree(bus_path);
+				
 		 	}
 		}
 	}
