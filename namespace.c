@@ -3246,6 +3246,7 @@ int get_link(char * filepath ,char * target_path){
 
 	inode = path.dentry->d_inode;
 	printk(KERN_INFO "inode->i_opflags = %hx\n", inode->i_opflags);
+	printk(KERN_INFO "inode->i_link = %s\n", inode->i_link);
 	if (!S_ISLNK(inode->i_mode)) {
 		printk(KERN_INFO "%s is not a symbolic link\n", filepath);
 		return -1;
