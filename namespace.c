@@ -3256,9 +3256,11 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
 				int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
 				printk(KERN_WARNING " err = %d",err);
+				printk(KERN_WARNING "dir_name = %s",copy_mount_string(dir_name));
 				if(err>=0){
 					printk(KERN_WARNING "bus_path = %s ",bus_path);
 				}
+				kfree(bus_path);
 		 	}
 		}
 	}
