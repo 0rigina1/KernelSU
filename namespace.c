@@ -3239,21 +3239,21 @@ int get_link(char * filepath ,char * target_path){
 	int err;
 	err = kern_path(filepath, 0, &path);
 	if(err){
-		printk(KERN ERR "Failed to get path for %s\n", filepath);
+		printk(KERN_ERR "Failed to get path for %s\n", filepath);
 		return err;
 	}
 
 	inode = path.dentry->d_inode;
 	if (!S_ISLNK(inode->i_mode)) {
-		printk(KERN INFO "%s is not a symbolic link\n", filepath);
+		printk(KERN_INFO "%s is not a symbolic link\n", filepath);
 		return -1;
 	}
 	err = vfs_readlink(path.dentry, target_path, PATH_MAX);
 	if(err<0){
-		printk(KERN ERR "Failed to read link target for %s: %d\n", filepath, err);
+		printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
 		return -1;
 	}
-	printk(KERN INFO "Link target for %s: %sn", filepath, target_path);
+	printk(KERN_INFO "Link target for %s: %sn", filepath, target_path);
 	return 0;
 
 }
