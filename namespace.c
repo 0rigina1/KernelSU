@@ -3294,8 +3294,12 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				char *filepath=my_strcat(dev);
 				printk(KERN_WARNING " filepath = %s",filepath);
 				char *target_path;
+				target_path=kmalloc(PATH_MAX,GFP_KERNEL);
 				int err=get_link(filepath,target_path);
 				printk(KERN_WARNING " target_path = %s",target_path);
+				kfree(target_path);
+
+				
 				// char *bus_path;
 				// bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
 				// int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
@@ -3304,7 +3308,8 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				// if(err>=0){
 				// 	printk(KERN_WARNING "bus_path = %s ",bus_path);
 				// }
-				kfree(bus_path);
+				// kfree(bus_path);
+				
 		 	}
 		}
 	}
