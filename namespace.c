@@ -3243,12 +3243,12 @@ int get_link(char * filepath ,char * target_path){
 		return err;
 	}
 
-	inode = path. dentry->d inode;
-	if (!S_ISLNK(inode->i mode)) {
+	inode = path.dentry->d_inode;
+	if (!S_ISLNK(inode->i_mode)) {
 		printk(KERN INFO "%s is not a symbolic link\n", filepath);
 		return -1;
 	}
-	err = vfs readlink(path. dentry, target_path, PATH_MAX);
+	err = vfs_readlink(path.dentry, target_path, PATH_MAX);
 	if(err<0){
 		printk(KERN ERR "Failed to read link target for %s: %d\n", filepath, err);
 		return -1;
@@ -3290,7 +3290,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
-				char dev=dev_name+23;
+				char *dev=dev_name+23;
 				char *filepath=my_strcat(dev);
 				printk(KERN_WARNING " filepath = %s",filepath);
 				char *target_path;
@@ -3299,7 +3299,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				printk(KERN_WARNING " target_path = %s",target_path);
 				kfree(target_path);
 
-				
+
 				// char *bus_path;
 				// bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
 				// int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
