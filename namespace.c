@@ -3253,14 +3253,14 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
 
-				if(path){
+				if(path!=NULL){
 					char *bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
 					int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
 					if(err>=0){
 						printk(KERN_WARNING "bus_path = %s ",bus_path);
 					}
 				}
-				
+
 		 	}
 		}
 	}
