@@ -3290,15 +3290,17 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
-				const char *dev=dev_name+23;
+				const char *dev;
+				dev=dev_name+23;
 				char *filepath=my_strcat(dev);
 				printk(KERN_WARNING " filepath = %s",filepath);
-				char *target_path;
-				target_path=kmalloc(PATH_MAX,GFP_KERNEL);
-				int err;
-				err=get_link(filepath,target_path);
-				printk(KERN_WARNING " target_path = %s",target_path);
-				kfree(target_path);
+				
+				// char *target_path;
+				// target_path=kmalloc(PATH_MAX,GFP_KERNEL);
+				// int err;
+				// err=get_link(filepath,target_path);
+				// printk(KERN_WARNING " target_path = %s",target_path);
+				// kfree(target_path);
 
 
 				// char *bus_path;
