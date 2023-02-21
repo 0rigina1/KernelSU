@@ -3237,6 +3237,7 @@ int get_link(char * filepath ,char * target_path){
 	struct path path;
 	struct inode *inode;
 	int err;
+	printk(KERN_WARNING " At %s filepath = %s",__func__,filepath);
 	err = kern_path(filepath, 0, &path);
 	if(err){
 		printk(KERN_ERR "Failed to get path for %s\n", filepath);
@@ -3306,14 +3307,16 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				printk(KERN_WARNING " filepath = %s  dev_name = %s",filepath,dev_name);
 
 
-				kfree(filepath);
-				// char *target_path;
-				// target_path=kmalloc(PATH_MAX,GFP_KERNEL);
-				// int err;
-				// err=get_link(filepath,target_path);
-				// printk(KERN_WARNING " target_path = %s",target_path);
-				// kfree(target_path);
+				
+				char *target_path;
+				target_path=kmalloc(PATH_MAX,GFP_KERNEL);
+				int err;
+				err=get_link(filepath,target_path);
+				printk(KERN_WARNING "err = %d target_path = %s",err,target_path);
 
+				kfree(target_path);
+
+				kfree(filepath);
 
 				// char *bus_path;
 				// bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
