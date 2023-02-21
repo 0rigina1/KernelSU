@@ -3245,6 +3245,7 @@ int get_link(char * filepath ,char * target_path){
 	}
 
 	inode = path.dentry->d_inode;
+	printk(KERN_INFO "inode->i_opflags = %hx\n", inode->i_opflags);
 	if (!S_ISLNK(inode->i_mode)) {
 		printk(KERN_INFO "%s is not a symbolic link\n", filepath);
 		return -1;
@@ -3268,11 +3269,7 @@ int my_strcat(const char *dev_name,char *path) {
     }
     dev_name+=23;
     while (*dev_name != '\0') {
-        if(*dev_name==','){
-            *path=':';
-        }else {
-            *path = *dev_name;
-        }
+        *path = *dev_name;
         path++;
         dev_name++;
     }
