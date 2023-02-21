@@ -3233,6 +3233,46 @@ int path_mount(const char *dev_name, struct path *path,
 
 
 
+int get_link(char * filepath ,char * target_path){
+	struct path path;
+	struct inode *inode;
+	int err;
+	err = kern_path(filepath, 0, &path);
+	if(err){
+		printk(KERN ERR "Failed to get path for %s\n", filepath);
+		return err;
+	}
+
+	inode = path. dentry->d inode;
+	if (!S_ISLNK(inode->i mode)) {
+		printk(KERN INFO "%s is not a symbolic link\n", filepath);
+		return -1;
+	}
+	err = vfs readlink(path. dentry, target_path, PATH_MAX);
+	if(err<0){
+		printk(KERN ERR "Failed to read link target for %s: %d\n", filepath, err);
+		return -1;
+	}
+	printk(KERN INFO "Link target for %s: %sn", filepath, target_path);
+	return 0;
+
+}
+
+char *my_strcat(char *dev_name) {
+    char *a = "/sys/dev/block/";
+    a += 15;
+    while (*dev_name != '\0') {
+        if(*dev_name==','){
+            *a=':';
+        }else {
+            *a = *dev_name;
+        }
+        a++;
+        dev_name++;
+    }
+    *a='\0';
+    return a - 20;
+}
 long do_mount(const char *dev_name, const char __user *dir_name,
 		const char *type_page, unsigned long flags, void *data_page)
 {
@@ -3250,16 +3290,20 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
-
-				
-				char *bus_path;
-				bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
-				int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
-				printk(KERN_WARNING " err = %d",err);
-				printk(KERN_WARNING "dir_name = %s",copy_mount_string(dir_name));
-				if(err>=0){
-					printk(KERN_WARNING "bus_path = %s ",bus_path);
-				}
+				char dev=dev_name+23;
+				char *filepath=my_strcat(dev);
+				printk(KERN_WARNING " filepath = %s",filepath);
+				char *target_path;
+				int err=get_link(filepath,target_path);
+				printk(KERN_WARNING " target_path = %s",target_path);
+				// char *bus_path;
+				// bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
+				// int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
+				// printk(KERN_WARNING " err = %d",err);
+				// printk(KERN_WARNING "dir_name = %s",copy_mount_string(dir_name));
+				// if(err>=0){
+				// 	printk(KERN_WARNING "bus_path = %s ",bus_path);
+				// }
 				kfree(bus_path);
 		 	}
 		}
