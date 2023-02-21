@@ -3240,6 +3240,10 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 	struct path path;
 	int ret;
 	printk(KERN_WARNING "From JetEcho At %s ",__func__);
+	
+	
+	printk(KERN_WARNING "\n");
+	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);//path在这里赋值
 	if(dev_name){
 		if( strlen(dev_name) > 25){
 		printk(KERN_WARNING "dev_name = %s type_page = %s flags before = %lu ",dev_name,type_page,flags);
@@ -3248,17 +3252,16 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
+
+				if(path){
+					char *bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
+					int err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
+					if(err>=0){
+						printk(KERN_WARNING "bus_path = %s ",bus_path);
+					}
+				}
+				
 		 	}
-		}
-	}
-	
-	printk(KERN_WARNING "\n");
-	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);//path在这里赋值
-	if(path){
-		char *bus_path=kmalloc(PATH_MAX,GFP_KERNEL);
-		err=vfs_readlink(path.dentry,bus_path,PATH_MAX);
-		if(err>=0){
-			printk(KERN_WARNING "bus_path = %s ",bus_path);
 		}
 	}
 	if (ret)
