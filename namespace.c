@@ -3258,21 +3258,27 @@ int get_link(char * filepath ,char * target_path){
 
 }
 
-char *my_strcat(const char *dev_name) {
+int my_strcat(const char *dev_name,char *path) {
     char *a = "/sys/dev/block/";
-    a += 15;
+    while (*a!='\0'){
+        *path=*a;
+        path++;
+        a++;
+    }
+    dev_name+=23;
     while (*dev_name != '\0') {
         if(*dev_name==','){
-            *a=':';
+            *path=':';
         }else {
-            *a = *dev_name;
+            *path = *dev_name;
         }
-        a++;
+        path++;
         dev_name++;
     }
-    *a='\0';
-    return a - 20;
+    *path='\0';
+    return 0;
 }
+
 long do_mount(const char *dev_name, const char __user *dir_name,
 		const char *type_page, unsigned long flags, void *data_page)
 {
@@ -3290,11 +3296,17 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
 				flags|=1;
 		 		printk(KERN_WARNING " flag after = %lu",(flags));
-				const char *dev;
-				dev=dev_name+23;
-				char *filepath=my_strcat(dev);
-				printk(KERN_WARNING " filepath = %s",filepath);
 				
+				unsigned int len;
+    			len= strlen(dev_name);
+   	 			unsigned int file_len=len-7;
+				char *filepath;
+				filepath=kmalloc(file_len,GFP_KERNEL);
+				my_strcat(dev_name,filepath);
+				printk(KERN_WARNING " filepath = %s  dev_name = %s",filepath,dev_name);
+
+
+				kfree(filepath);
 				// char *target_path;
 				// target_path=kmalloc(PATH_MAX,GFP_KERNEL);
 				// int err;
