@@ -4631,6 +4631,7 @@ int vfs_readlink(struct dentry *dentry, char __user *buffer, int buflen)
 			return PTR_ERR(link);
 	}
 	res = readlink_copy(buffer, buflen, link);
+	printk(KERN_INFO "res = %d\n", res);
 	do_delayed_call(&done);
 	return res;
 }
