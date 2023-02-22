@@ -3291,8 +3291,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 		// flags|=1;
 		// printk(KERN_WARNING " flag after = %lu",(flags|0x1));
 			if( strstr(dev_name, "/dev/block/vold/public:") != NULL ){
-				flags|=1;
-		 		printk(KERN_WARNING " flag after = %lu",(flags));
+				
 				
 				unsigned int len;
     			len= strlen(dev_name);
@@ -3303,7 +3302,12 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 
 			   	const char *target_path;
 				target_path=get_link(filepath);
-				printk(KERN_WARNING "At %s: filepath = %s ==> target_path = %s",__func__,target_path,filepath);
+				printk(KERN_WARNING "At %s: target_path = %s ==> filepath = %s",__func__,target_path,filepath);
+				printk(KERN_WARNING "Partition %s at port %c",dev_name,*(target_path+83));
+				if(*(target_path+83)!='2'&&*(target_path+83)!='3'){
+					flags|=1;
+		 			printk(KERN_WARNING " flag after = %lu",(flags));
+				}
 				kfree(filepath);
 
 				// char *bus_path;
