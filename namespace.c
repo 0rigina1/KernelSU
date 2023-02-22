@@ -3244,32 +3244,44 @@ int get_link(char * filepath ,char * target_path){
 		return err;
 	}
 
-	inode = path.dentry->d_inode;
-	printk(KERN_INFO "inode->i_opflags = %hx\n", inode->i_opflags);
-	printk(KERN_INFO "inode->i_link = %s\n", inode->i_link);
-	if (!S_ISLNK(inode->i_mode)) {
-		printk(KERN_INFO "%s is not a symbolic link\n", filepath);
-		return -1;
-	}
+	DEFINE_DELAYED_CALL(done);
+
+	printk(KERN_INFO "Link target for %s: %sn", filepath, vfs_get_link(path.dentry,&done));
+	
+	target_path=vfs_get_link(path.dentry,&done);
+
+
+
+	// inode = path.dentry->d_inode;
+	// printk(KERN_INFO "inode->i_opflags = %hx\n", inode->i_opflags);
+	// printk(KERN_INFO "inode->i_link = %s\n", inode->i_link);
+	// if (!S_ISLNK(inode->i_mode)) {
+	// 	printk(KERN_INFO "%s is not a symbolic link\n", filepath);
+	// 	return -1;
+	// }
 	
 
-	if (d_is_symlink(path.dentry) || inode->i_op->readlink) {
-		error = security_inode_readlink(path.dentry);
-		if (!error) {
-			touch_atime(&path);
-			error = vfs_readlink(path.dentry, buf, bufsiz);
-			if(error<0){
-				printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
-				return -1;
-			}
-		}
-	}
+
+	// if (d_is_symlink(path.dentry) || inode->i_op->readlink) {
+	// 	error = security_inode_readlink(path.dentry);
+	// 	if (!error) {
+	// 		touch_atime(&path);
+	// 		error = vfs_readlink(path.dentry, buf, bufsiz);
+	// 		if(error<0){
+	// 			printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
+	// 			return -1;
+	// 		}
+	// 	}
+	// }
+
+
 	
 	// err = vfs_readlink(path.dentry, target_path, PATH_MAX);
 	// if(err<0){
 	// 	printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
 	// 	return -1;
 	// }
+
 	printk(KERN_INFO "Link target for %s: %sn", filepath, target_path);
 	return 0;
 
