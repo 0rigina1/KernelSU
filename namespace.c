@@ -3251,11 +3251,25 @@ int get_link(char * filepath ,char * target_path){
 		printk(KERN_INFO "%s is not a symbolic link\n", filepath);
 		return -1;
 	}
-	err = vfs_readlink(path.dentry, target_path, PATH_MAX);
-	if(err<0){
-		printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
-		return -1;
+	
+
+	if (d_is_symlink(path.dentry) || inode->i_op->readlink) {
+		error = security_inode_readlink(path.dentry);
+		if (!error) {
+			touch_atime(&path);
+			error = vfs_readlink(path.dentry, buf, bufsiz);
+			if(error<0){
+				printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
+				return -1;
+			}
+		}
 	}
+	
+	// err = vfs_readlink(path.dentry, target_path, PATH_MAX);
+	// if(err<0){
+	// 	printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
+	// 	return -1;
+	// }
 	printk(KERN_INFO "Link target for %s: %sn", filepath, target_path);
 	return 0;
 
