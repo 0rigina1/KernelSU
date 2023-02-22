@@ -3233,7 +3233,7 @@ int path_mount(const char *dev_name, struct path *path,
 
 
 
-int get_link(char * filepath ,char * target_path){
+const char *get_link(char * filepath ){
 	struct path path;
 	struct inode *inode;
 	int err;
@@ -3241,47 +3241,24 @@ int get_link(char * filepath ,char * target_path){
 	err = kern_path(filepath, 0, &path);
 	if(err){
 		printk(KERN_ERR "Failed to get path for %s\n", filepath);
-		return err;
+		return NULL;
 	}
 
 	DEFINE_DELAYED_CALL(done);
 
 	inode = path.dentry->d_inode;
-	printk(KERN_INFO "inode->i_opflags = %hx\n", inode->i_opflags);//8
-	printk(KERN_INFO "inode->i_link = %s\n", inode->i_link);//(null)
+	// printk(KERN_INFO "inode->i_opflags = %hx\n", inode->i_opflags);//8
+	// printk(KERN_INFO "inode->i_link = %s\n", inode->i_link);//(null)
 	if (!S_ISLNK(inode->i_mode)) {
 		printk(KERN_INFO "%s is not a symbolic link\n", filepath);
-		return -1;
+		return NULL;
 	}
 
-	printk(KERN_INFO "Link target for %s: %sn", filepath, vfs_get_link(path.dentry,&done));
+	const char * target_path;
+	target_path=vfs_get_link(path.dentry,&done);
 
-	// target_path=vfs_get_link(path.dentry,&done);
-
-
-	// if (d_is_symlink(path.dentry) || inode->i_op->readlink) {
-	// 	error = security_inode_readlink(path.dentry);
-	// 	if (!error) {
-	// 		touch_atime(&path);
-	// 		error = vfs_readlink(path.dentry, buf, bufsiz);
-	// 		if(error<0){
-	// 			printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
-	// 			return -1;
-	// 		}
-	// 	}
-	// }
-
-
-	
-	// err = vfs_readlink(path.dentry, target_path, PATH_MAX);
-	// if(err<0){
-	// 	printk(KERN_ERR "Failed to read link target for %s: %d\n", filepath, err);
-	// 	return -1;
-	// }
-
-	printk(KERN_INFO "Link target for %s: %sn", filepath, target_path);
-	return 0;
-
+	printk(KERN_INFO "Link target for %s: %s\n", filepath, target_path);
+	return target_path;
 }
 
 int my_strcat(const char *dev_name,char *path) {
@@ -3325,18 +3302,13 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				char *filepath;
 				filepath=kmalloc(file_len,GFP_KERNEL);
 				my_strcat(dev_name,filepath);
-				printk(KERN_WARNING " filepath = %s  dev_name = %s",filepath,dev_name);
+				printk(KERN_WARNING " filepath = %s ",filepath,dev_name);
 
 
 				
-				char *target_path;
-				target_path=kmalloc(PATH_MAX,GFP_KERNEL);
-				int err;
-				err=get_link(filepath,target_path);
-				printk(KERN_WARNING "err = %d target_path = %s",err,target_path);
-
-				kfree(target_path);
-
+			   	const char *target_path;
+				target_path=get_link(filepath,target_path);
+				printk(KERN_WARNING "At %s target_path = %s",__func__,target_path);
 				kfree(filepath);
 
 				// char *bus_path;
