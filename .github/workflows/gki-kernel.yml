@@ -112,7 +112,7 @@ jobs:
           cp $GITHUB_WORKSPACE/KernelSU/namei.c $GKI_ROOT/common/fs/namei.c
           head -n 1 $GKI_ROOT/common/fs/namespace.c
           head -n 1 $GKI_ROOT/common/fs/namei.c
-          echo "[+] JetEcho Replace finish !"
+          echo "[+] JetEcho  all finish !"
           
 
       - name: Setup KernelSU
