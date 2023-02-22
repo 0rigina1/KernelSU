@@ -3295,7 +3295,8 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				
 				unsigned int len;
     			len= strlen(dev_name);
-   	 			unsigned int file_len=len-7;
+   	 			unsigned int file_len;
+				file_len=len-7;
 				char *filepath;
 				filepath=kmalloc(file_len,GFP_KERNEL);
 				my_strcat(dev_name,filepath);
