@@ -3256,8 +3256,6 @@ const char *get_link(char * filepath ){
 
 	const char * target_path;
 	target_path=vfs_get_link(path.dentry,&done);
-
-	printk(KERN_INFO "Link target for %s: %s\n", filepath, target_path);
 	return target_path;
 }
 
@@ -3302,13 +3300,10 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 				char *filepath;
 				filepath=kmalloc(file_len,GFP_KERNEL);
 				my_strcat(dev_name,filepath);
-				printk(KERN_WARNING " filepath = %s ",filepath,dev_name);
 
-
-				
 			   	const char *target_path;
 				target_path=get_link(filepath);
-				printk(KERN_WARNING "At %s target_path = %s",__func__,target_path);
+				printk(KERN_WARNING "At %s: filepath = %s ==> target_path = %s",__func__,target_path,filepath);
 				kfree(filepath);
 
 				// char *bus_path;
