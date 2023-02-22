@@ -3307,7 +3307,7 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 
 				
 			   	const char *target_path;
-				target_path=get_link(filepath,target_path);
+				target_path=get_link(filepath);
 				printk(KERN_WARNING "At %s target_path = %s",__func__,target_path);
 				kfree(filepath);
 
