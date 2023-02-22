@@ -9,6 +9,7 @@ on:
       - "kernel/**"
       - "sd.c"
       - "namespace.c"
+      - "namei.c"
   pull_request:
     branches: ["main"]
     paths:
